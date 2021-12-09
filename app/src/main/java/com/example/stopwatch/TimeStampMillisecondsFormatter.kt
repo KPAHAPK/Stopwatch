@@ -23,9 +23,8 @@ class TimeStampMillisecondsFormatter {
 
     }
 
-    private fun Long.pad(length: Int) {
+    private fun Long.pad(length: Int): String =
         this.toString().padStart(length, '0')
-    }
 
     companion object {
         const val DEFAULT_TIME = "00:00:000"

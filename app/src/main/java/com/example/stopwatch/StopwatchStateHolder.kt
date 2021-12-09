@@ -6,6 +6,7 @@ class StopwatchStateHolder(
     private val timeStampMillisecondsFormatter: TimeStampMillisecondsFormatter,
 ) {
     var currentState: StopwatchState = StopwatchState.Paused(stopStateTime)
+        private set
 
     fun start() {
         currentState = stopwatchStateCalculator.calculateRunningState(currentState)

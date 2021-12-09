@@ -1,5 +1,6 @@
 package com.example.stopwatch
 
+import android.content.res.Resources
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -9,7 +10,7 @@ class StopwatchListOrchestrator(
     private val scope: CoroutineScope,
 ) {
     private var job: Job? = null
-    private val mutableTicker = MutableStateFlow("")
+    private val mutableTicker = MutableStateFlow("00:00:000")
     val ticker: StateFlow<String> = mutableTicker
 
     fun start() {
@@ -45,6 +46,6 @@ class StopwatchListOrchestrator(
     }
 
     private fun clearValue() {
-        mutableTicker.value = ""
+        mutableTicker.value = "00:00:000"
     }
 }
