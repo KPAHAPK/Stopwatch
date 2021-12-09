@@ -3,23 +3,23 @@ package com.example.stopwatch
 class StopwatchStateHolder(
     private val stopwatchStateCalculator: StopwatchStateCalculator,
     private val elapsedTimeCalculator: ElapsedTimeCalculator,
-    private val timeStampMillisecondsFormatter: TimeStampMillisecondsFormatter
+    private val timeStampMillisecondsFormatter: TimeStampMillisecondsFormatter,
 ) {
     var currentState: StopwatchState = StopwatchState.Paused(stopStateTime)
 
-    fun start(){
+    fun start() {
         currentState = stopwatchStateCalculator.calculateRunningState(currentState)
     }
 
-    fun pause(){
+    fun pause() {
         currentState = stopwatchStateCalculator.calculatePausedState(currentState)
     }
 
-    fun stop(){
+    fun stop() {
         currentState = StopwatchState.Paused(stopStateTime)
     }
 
-    companion object{
+    companion object {
         private const val stopStateTime = 0L
     }
 
