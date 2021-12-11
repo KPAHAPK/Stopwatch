@@ -1,6 +1,5 @@
-package com.example.stopwatch
+package com.example.stopwatch.model
 
-import android.content.res.Resources
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
