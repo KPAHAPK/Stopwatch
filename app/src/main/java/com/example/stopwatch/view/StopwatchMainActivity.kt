@@ -3,21 +3,30 @@ package com.example.stopwatch.view
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.get
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.stopwatch.*
 import com.example.stopwatch.databinding.ActivityStopwatchMainBinding
+import com.example.stopwatch.model.*
 import com.example.stopwatch.vm.MainViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 class StopwatchMainActivity : AppCompatActivity() {
 
     private lateinit var binding : ActivityStopwatchMainBinding
+    private val adapter by lazy { RVAdapter(this, scopeObserver) }
 
-    private val viewModel by lazy {
-        ViewModelProvider(this).get(MainViewModel::class.java)
+    private val scopeObserver = CoroutineScope(Dispatchers.Main + SupervisorJob())
+    val viewModel by lazy {
+        ViewModelProvider(this)[MainViewModel()::class.java]
+    }
+
+    fun getTicker() : StateFlow<Map<StopwatchTask, String>>{
+        return viewModel.observe()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -25,19 +34,16 @@ class StopwatchMainActivity : AppCompatActivity() {
         binding = ActivityStopwatchMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        with(binding){
-            viewModel.liveData.observe(this@StopwatchMainActivity){
-                textTime.text = it
+        scopeObserver.launch {
+            viewModel.observe().collect{
+                adapter.notifyDataSetChanged()
             }
-            buttonStart.setOnClickListener {
-                viewModel.startTicker()
-            }
-            buttonPause.setOnClickListener{
-                viewModel.pauseTicker()
-            }
-            buttonStop.setOnClickListener{
-                viewModel.stopTicker()
-            }
+        }
+
+        binding.rvStopwatches.layoutManager = LinearLayoutManager(this)
+        binding.rvStopwatches.adapter = adapter
+        binding.fabAdd.setOnClickListener{
+            adapter.addStopwatchTask()
         }
     }
 }
