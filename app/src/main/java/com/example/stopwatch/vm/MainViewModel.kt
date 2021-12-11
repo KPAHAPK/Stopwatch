@@ -1,33 +1,30 @@
 package com.example.stopwatch.vm
 
 import androidx.lifecycle.*
-import com.example.stopwatch.model.ElapsedTimeCalculator
-import com.example.stopwatch.model.StopwatchListOrchestrator
-import com.example.stopwatch.model.StopwatchStateCalculator
-import com.example.stopwatch.model.StopwatchStateHolder
+import androidx.recyclerview.widget.RecyclerView
+import com.example.stopwatch.model.*
 import com.example.stopwatch.view.TimeStampMillisecondsFormatter
 import com.example.stopwatch.view.TimestampProvider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 class MainViewModel: ViewModel() {
-    private val mutableLiveData : MutableLiveData<String> = MutableLiveData()
-    val liveData : LiveData<String> = mutableLiveData
+    private val mutableLiveData = MutableLiveData<Map<StopwatchTask, String>>()
+    val livedata: LiveData<Map<StopwatchTask, String>> = mutableLiveData
 
     private val timestampProvider = object: TimestampProvider {
         override fun getMilliseconds(): Long {
             return System.currentTimeMillis()
         }
     }
-
     private val scopeObservable = CoroutineScope(Dispatchers.Main + SupervisorJob())
-    private val scopeObserver = CoroutineScope(Dispatchers.Main + SupervisorJob())
 
     private val stopwatchStateOrchestrator = StopwatchListOrchestrator(
-        stopwatchStateHolder = StopwatchStateHolder(
+        stopwatchStateHolderCreator = StopwatchStateHolderCreator(
             stopwatchStateCalculator = StopwatchStateCalculator(
                 timestampProvider = timestampProvider,
                 elapsedTimeCalculator = ElapsedTimeCalculator(timestampProvider)
@@ -36,20 +33,19 @@ class MainViewModel: ViewModel() {
         ), scope = scopeObservable
     )
 
-    fun startTicker() {
-        scopeObserver.launch {
-            stopwatchStateOrchestrator.ticker.collect(){
-                mutableLiveData.value = it
-            }
-        }
-        stopwatchStateOrchestrator.start()
+    fun observe(): StateFlow<Map<StopwatchTask, String>>{
+        return stopwatchStateOrchestrator.ticker
     }
 
-    fun pauseTicker() {
-        stopwatchStateOrchestrator.pause()
+    fun startTicker(stopwatchTask: StopwatchTask) {
+        stopwatchStateOrchestrator.start(stopwatchTask)
     }
 
-    fun stopTicker(){
-        stopwatchStateOrchestrator.stop()
+    fun pauseTicker(stopwatchTask: StopwatchTask) {
+        stopwatchStateOrchestrator.pause(stopwatchTask)
+    }
+
+    fun stopTicker(stopwatchTask: StopwatchTask){
+        stopwatchStateOrchestrator.stop(stopwatchTask)
     }
 }
