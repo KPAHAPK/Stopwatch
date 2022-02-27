@@ -1,4 +1,4 @@
-package com.example.stopwatch
+package com.example.stopwatch.model
 
 sealed class StopwatchState {
     data class Paused(val elapsedTime: Long) : StopwatchState()

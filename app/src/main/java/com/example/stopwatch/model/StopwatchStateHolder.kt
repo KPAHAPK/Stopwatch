@@ -1,4 +1,6 @@
-package com.example.stopwatch
+package com.example.stopwatch.model
+
+import com.example.stopwatch.view.TimeStampMillisecondsFormatter
 
 class StopwatchStateHolder(
     private val stopwatchStateCalculator: StopwatchStateCalculator,
